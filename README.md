@@ -76,3 +76,19 @@
    
    
    Please note: this will empty the node so be sure to use something like span above to avoid any content being erased accidentally.
+   
+   
+   ## Debugging
+   
+   There is a debug shortcode used to troubleshoot any issues with the autofill functionality:
+   
+   `[netfactor_debug]`
+   
+   This shortcode prints two HTML elements( `<span>`,`<input`) for every value the API returns and assigns a class with the `nf_` prefix like:
+   
+   `<span class="nf_companyId"></span>`
+   
+   `<input class="nf_companyId">`
+   
+   This is done for every Dimension listed on page 5 of the VisitorTrack IP-Based API Documentation so we can easily verify that the plugin is 
+   targeting the right elements, and inserting the right value on page load.
