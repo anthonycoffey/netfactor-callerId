@@ -53,43 +53,21 @@
   The visitors IP address is used to query the VisitorTrack IP-Based API. Then, using `foreach` we loop through all the values 
   returned and use the "key" to create a CSS selector. 
   
-  I used the 'Dimension' with a prefix of `nf_` to create a CSS selector:
+  To create a CSS selector, just use the 'Dimension' with a prefix of `nf_` as shown below:
   
-  `.nf_companyId`
-  
-  `.nf_companyName`
-  
-  `.nf_websiteUrl`
-  
-   and so on...
+  `.nf_companyId`, `.nf_companyName`, and so on.
    
    ## Usage
  
    Example:
    
-   `<span class="nf_companyId"></span>`
+    <span class="nf_companyId"></span>
    
    OR
    
-   `<input class="nf_companyId">`
+    <input class="nf_companyId">
  
    The function will find the elements, and insert the value for companyId as the page is loading using Javascript.
-   
-   
-   ## Debugging
-   
-   There is a debug shortcode used to troubleshoot any issues with the autofill functionality:
-   
-   `[netfactor_debug]`
-   
-   This shortcode prints two HTML elements( `<span>`,`<input`) for every value the API returns and assigns a class with the `nf_` prefix like:
-   
-   `<span class="nf_companyId"></span>`
-   
-   `<input class="nf_companyId">`
-   
-   Every 'Dimension' listed on page 5 of the VisitorTrack IP-Based API Documentation is listed so we can easily verify that the plugin is 
-   targeting the right elements, and inserting the right value as the page loads up.
    
    ## Enabled Dimensions
    
@@ -97,13 +75,13 @@
    
    Currently, companyName is the default value. However, by adding additional fields to the array we can "enable" more fields, for now only `companyName` is active
    
-   Example: Shown below, 'CompanyName', 'stockExchange', and 'geoCity' are enabled
+   Example: 'CompanyName', 'stockExchange', and 'geoCity' are enabled in the array shown below.
    
-   ```
-   $ENABLED_DIMENSIONS = array('companyName','stockExchange','geoCity');
-   ```
    
-   Please note: DO NOT use `nf_` prefix with values in this array
+    $ENABLED_DIMENSIONS = array('companyName','stockExchange','geoCity');
+   
+   
+   Please note: ***DO NOT*** use `nf_` prefix with values in this array
    
    Please note: If you add a value, be sure to update all occurences. `(Line:39 and Line:110)`
    
@@ -114,3 +92,21 @@
    | 0.3  | Removed jQuery wrapper, and replaced previous jQuery approach with pure vanilla JS. Additionally, I've updated the `wp_head` action hook that uses `netfactor_callerId()` as it's callback function. I've replaced `wp_head` with `wp_footer`, this inserts the Javascript in the footer, after the DOM has loaded up. |
    | 0.2  | Added "Company Name" logic, and improved the `netfactor_get_user_ip()` function. Now, it uses Ipify.org free API to get the public IP address of the visitor. Also, added a variable to both the debug function and the "main" function that retricts enabled fields, by adding values to the `$ENABLED_DIMENSIONS` array, you can enable more fields. Currently, all fields are disabled EXCEPT `companyName`
    | 0.1  | Initial plugin developed, but missing core functionality. API request working, but missing "Company Name" conditional logic.  |
+   
+   
+ 
+   
+  ## Debugging
+  
+  There is a debug shortcode used to troubleshoot any issues with the autofill functionality:
+  
+  `[netfactor_debug]`
+  
+  This shortcode prints two HTML elements( `<span>`,`<input`) for every value the API returns and assigns a class with the `nf_` prefix like:
+  
+  `<span class="nf_companyId"></span>`
+  
+  `<input class="nf_companyId">`
+  
+  Every 'Dimension' listed on page 5 of the VisitorTrack IP-Based API Documentation is listed so we can easily verify that the plugin is 
+  targeting the right elements, and inserting the right value as the page loads up.
