@@ -4,9 +4,9 @@
   
   No configuration is required, simply install the plugin and click activate.
   
-  Once the plugin is activated, it begins working to update the `innerHTML` property of all matching HTML elements that are prefixed with any of the CSS selectors listed below.
+  Once the plugin is activated, it begins working to update the `innerHTML` or `value` attribute of all matching HTML elements that are prefixed with any of the CSS selectors listed below.
   
-  Also, it works on all typographic elements, and form fields!
+  ***Please note:*** It only works on `<span>` and `<input>` HTML elements
   
   
    `.nf_companyId`
@@ -48,12 +48,12 @@
   
   This function contains all the code used to retrieve data, and then incorporate it into the website via Javascript.
  
-  It is triggered by the 'wp_head' action hook (more info: https://codex.wordpress.org/Function_Reference/wp_head)
+  It is triggered by the 'wp_footer' action hook (more info: https://codex.wordpress.org/Function_Reference/wp_footer)
  
-  This function uses the visitors IP address to GET data from the VisitorTrack IP-Based API. I loop through all the values 
-  returned and use the key to create a CSS selector. 
+  The visitors IP address is used to query the VisitorTrack IP-Based API. Then, using `foreach` we loop through all the values 
+  returned and use the "key" to create a CSS selector. 
   
-  I've used the 'Dimension' with a prefix of `nf_` to create a CSS selector that looks like this:
+  I used the 'Dimension' with a prefix of `nf_` to create a CSS selector:
   
   `.nf_companyId`
   
@@ -62,20 +62,18 @@
   `.nf_websiteUrl`
   
    and so on...
+   
+   ## Usage
  
-   Anywhere these classes are used, the netfactor_callerId() function defined below will target
-   all of the CSS selectors in the Dimension column listed on page 5 of the VisitorTrack IP-Based API Documentation
-   and using jQuery will insert the respective value into the targeted HTML element.
- 
-   For example, anywhere on the site where there is an HTML element that looks like this:
+   Example:
    
    `<span class="nf_companyId"></span>`
+   
+   OR
+   
+   `<input class="nf_companyId">`
  
-   The function will find the element, and insert the respective value on page load for companyId using jQuery .html() function.
-   If the element doesn't exist, nothing happens. If the element does exist, then the appropriate value is inserted into element.
-   
-   
-   Please note: this will empty the node so be sure to use something like span above to avoid any content being erased accidentally.
+   The function will find the elements, and insert the value for companyId as the page is loading using Javascript.
    
    
    ## Debugging
@@ -90,8 +88,8 @@
    
    `<input class="nf_companyId">`
    
-   This is done for every Dimension listed on page 5 of the VisitorTrack IP-Based API Documentation so we can easily verify that the plugin is 
-   targeting the right elements, and inserting the right value on page load.
+   Every 'Dimension' listed on page 5 of the VisitorTrack IP-Based API Documentation is listed so we can easily verify that the plugin is 
+   targeting the right elements, and inserting the right value as the page loads up.
    
    ## Enabled Dimensions
    
@@ -113,5 +111,6 @@
    
    | version  | Description |
    | ------------- | ------------- |
+   | 0.3  | Removed jQuery wrapper, and replaced previous jQuery approach with pure vanilla JS. Additionally, I've updated the `wp_head` action hook that uses `netfactor_callerId()` as it's callback function. I've replaced `wp_head` with `wp_footer`, this inserts the Javascript in the footer, after the DOM has loaded up. |
    | 0.2  | Added "Company Name" logic, and improved the `netfactor_get_user_ip()` function. Now, it uses Ipify.org free API to get the public IP address of the visitor. Also, added a variable to both the debug function and the "main" function that retricts enabled fields, by adding values to the `$ENABLED_DIMENSIONS` array, you can enable more fields. Currently, all fields are disabled EXCEPT `companyName`
    | 0.1  | Initial plugin developed, but missing core functionality. API request working, but missing "Company Name" conditional logic.  |

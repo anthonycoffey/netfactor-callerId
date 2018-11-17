@@ -3,7 +3,7 @@
 Plugin Name: Netfactor CallerId for WordPress
 Description: This is a custom plugin that utilizes the VisitorTrack IP-Based API to target all dimensions using a prefixed CSS selector, and then inesrt the respective value into the targeted HTML element.
 Author: Anthony Coffey
-Version: 0.2
+Version: 0.3
 Author URI: https://coffeywebdev.com
 */
 
@@ -27,12 +27,12 @@ Author URI: https://coffeywebdev.com
 *  Anywhere on the site, if there was an HTML element that looked like this:
 *  <span class="nf_companyId"></span>
 *
-*  On page load, this function will insert the respective value for companyId using jQuery .html() function,
+*  On page load, this function will insert the respective value for companyId using Javascript
 *  this will empty the node so be sure to use something like span above to avoid any content being erased accidentally.
 *
 */
 
-add_action('wp_head', 'netfactor_callerId');
+add_action('wp_footer', 'netfactor_callerId');
 function netfactor_callerId(){
 	// ENABLED DIMENSIONS
 	// add more strings to the array to enable support for more values
@@ -63,7 +63,7 @@ function netfactor_callerId(){
 			$body = json_decode(wp_remote_retrieve_body($get));
 
 			// create javascript wrapper
-			echo "<script>(function ($, window, document, undefined) {'use strict';$(function () {";
+			echo "<script>";
 
 			if($body->isp == false){
 				// do nothing special
@@ -74,17 +74,15 @@ function netfactor_callerId(){
 
 			foreach ($body as $key => $value){
 				/*
-				 * target each dimension, and autofill the value using jQuery function .html()
-				 * more info: http://api.jquery.com/html/
-				 *
-				 */
+			  * target each dimension, and autofill the value
+			  */
 					if(in_array($key, $ENABLED_DIMENSIONS)):
-						echo "jQuery('input.nf_{$key}').val('{$value}');";
-						echo "jQuery('.nf_{$key}:not(input)').html('{$value}');";
+						echo "document.querySelector('span.nf_{$key}').innerHTML = '{$value}';";
+						echo "document.querySelector('input.nf_{$key}').value = '{$value}';";
 					endif;
 			}
 
-			echo "});})(jQuery, window, document);</script>";
+			echo "</script>";
 
 			$autofill_html = ob_get_clean();
 			echo $autofill_html;
@@ -133,7 +131,7 @@ function netfactor_make_spans(){
 			$body = json_decode(wp_remote_retrieve_body($get));
 
 			if($body->isp == false){
-				var_dump($body);
+
 			} else {
 				// If IsIsp TRUE, then display "Your Company" instead of the value returned by the API
 				$body->companyName = "Your Company";
