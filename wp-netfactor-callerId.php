@@ -5,6 +5,7 @@ Description: This is a custom plugin that utilizes the VisitorTrack IP-Based API
 Author: Anthony Coffey
 Version: 0.2
 Author URI: https://coffeywebdev.com
+*/
 
 /**
 *
@@ -35,7 +36,7 @@ add_action('wp_head', 'netfactor_callerId');
 function netfactor_callerId(){
 	// ENABLED DIMENSIONS
 	// add more strings to the array to enable support for more values
-	$enabled_dimensions = array('companyName');
+	$ENABLED_DIMENSIONS = array('companyName');
 
 
 	// get IP address of visitor
@@ -50,7 +51,6 @@ function netfactor_callerId(){
 
 	// check to ensure this version of WordPress has wp_remote_get() function
 	if(function_exists('wp_remote_get')){
-
 		$get = wp_remote_get($api_url,array(
 			'headers' => array(
 				'Authorization' => "{$bearer} {$token}"
@@ -60,14 +60,15 @@ function netfactor_callerId(){
 		// check to ensure this version of WordPress has wp_remote_retrieve_body() function
 		if(function_exists('wp_remote_retrieve_body')){
 			ob_start();
+			$body = json_decode(wp_remote_retrieve_body($get));
+
 			// create javascript wrapper
 			echo "<script>(function ($, window, document, undefined) {'use strict';$(function () {";
-			$body = json_decode(wp_remote_retrieve_body($get));
 
 			if($body->isp == false){
 				// do nothing special
 			} else {
-				// IF ISSSP FALSE, THEN DISPLAY "YOUR COMPANY" INSTEAD OF VALUE RETURNED FROM API
+				// If IsIsp TRUE, then display "Your Company" instead of the value returned by the API
 				$body->companyName = "Your Company";
 			}
 
@@ -77,16 +78,17 @@ function netfactor_callerId(){
 				 * more info: http://api.jquery.com/html/
 				 *
 				 */
-					if(in_array($key, $enabled_dimensions)):
+					if(in_array($key, $ENABLED_DIMENSIONS)):
 						echo "jQuery('input.nf_{$key}').val('{$value}');";
 						echo "jQuery('.nf_{$key}:not(input)').html('{$value}');";
 					endif;
 			}
+
 			echo "});})(jQuery, window, document);</script>";
+
 			$autofill_html = ob_get_clean();
 			echo $autofill_html;
 		}
-
 	}
 
 }
@@ -105,7 +107,7 @@ add_shortcode('netfactor_debug','netfactor_make_spans');
 function netfactor_make_spans(){
 	// ENABLED DIMENSIONS
 	// add more strings to the array to enable support for more values
-	$enabled_dimensions = array('companyName');
+	$ENABLED_DIMENSIONS = array('companyName');
 
 	// get IP address of visitor
 	if(function_exists('netfactor_get_user_ip')){
@@ -127,47 +129,34 @@ function netfactor_make_spans(){
 
 		// check to ensure this version of WordPress has wp_remote_retrieve_body() function
 		if(function_exists('wp_remote_retrieve_body')){
-
+			// get body of reponse, convert to PHP
 			$body = json_decode(wp_remote_retrieve_body($get));
-
 
 			if($body->isp == false){
 				var_dump($body);
 			} else {
-				// If "isp" is true, then change companyName to "Your Company"
+				// If IsIsp TRUE, then display "Your Company" instead of the value returned by the API
 				$body->companyName = "Your Company";
 			}
 
-
 			foreach ($body as $key => $value){
-				if(in_array($key, $enabled_dimensions)) {
+				if(in_array($key, $ENABLED_DIMENSIONS)) {
 					echo "<span class='nf_{$key}' style='display: block;'></span>";
 					echo "<input class='nf_{$key}' value='' type='text'>";
 				}
 			}
-
 		}
-
-
 	}
+
 }
 
-
 /**
-* This function returns the visitor's IP address.
+*  Get visitor's IP address using ipify.org API
+*  read more: https://www.ipify.org/
 */
 function netfactor_get_user_ip() {
-	if( array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ) {
-		if (strpos($_SERVER['HTTP_X_FORWARDED_FOR'], ',')>0) {
-			$addr = explode(",",$_SERVER['HTTP_X_FORWARDED_FOR']);
-			return trim($addr[0]);
-		} else {
-			return $_SERVER['HTTP_X_FORWARDED_FOR'];
-		}
-	}
-	else {
-		return $_SERVER['REMOTE_ADDR'];
-	}
+	$ip = file_get_contents('https://api.ipify.org');
+	return $ip;
 }
 
 ?>
