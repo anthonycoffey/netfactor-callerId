@@ -6,7 +6,7 @@
   
   Once the plugin is activated, it begins working to update the `innerHTML` or `value` attribute of all matching HTML elements that are prefixed with any of the CSS selectors listed below.
   
-  ***Please note:*** It only works on `<span>` and `<input>` HTML elements
+  Please note: It only works on `<span>` and `<input>` HTML elements
   
   
    `.nf_companyId`
@@ -97,15 +97,15 @@
    
    Currently, companyName is the default value. However, by adding additional fields to the array we can "enable" more fields, for now only `companyName` is active
    
-   Example:
+   Example: Shown below, 'CompanyName', 'stockExchange', and 'geoCity' are enabled
    
    ```
    $ENABLED_DIMENSIONS = array('companyName','stockExchange','geoCity');
    ```
    
-   ***Please note:*** DO NOT use `nf_` prefix with values in this array
+   Please note: DO NOT use `nf_` prefix with values in this array
    
-   ***Please note:*** If you add a value, be sure to update all occurences. `(Line:39 and Line:110)`
+   Please note: If you add a value, be sure to update all occurences. `(Line:39 and Line:110)`
    
    ## Changelog
    
