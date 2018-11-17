@@ -92,3 +92,26 @@
    
    This is done for every Dimension listed on page 5 of the VisitorTrack IP-Based API Documentation so we can easily verify that the plugin is 
    targeting the right elements, and inserting the right value on page load.
+   
+   ## Enabled Dimensions
+   
+   A new variable has been added to ***BOTH*** functions in the `wp-netfactor-callerId.php`, it's an array containing the string `companyName`. This is used to enable/disable a field, so that it is not used. 
+   
+   Currently, companyName is the default value. However, by adding additional fields to the array we can "enable" more fields, for now only `companyName` is active
+   
+   Example:
+   
+   ```
+   $ENABLED_DIMENSIONS = array('companyName','stockExchange','geoCity');
+   ```
+   
+   ***Please note:*** DO NOT use `nf_` prefix with values in this array
+   
+   ***Please note:*** If you add a value, be sure to update all occurences. `(Line:39 and Line:110)`
+   
+   ## Changelog
+   
+   | version  | Description |
+   | ------------- | ------------- |
+   | 0.2  | Added "Company Name" logic, and improved the `netfactor_get_user_ip()` function. Now, it uses Ipify.org free API to get the public IP address of the visitor. Also, added a variable to both the debug function and the "main" function that retricts enabled fields, by adding values to the `$ENABLED_DIMENSIONS` array, you can enable more fields. Currently, all fields are disabled EXCEPT `companyName`
+   | 0.1  | Initial plugin developed, but missing core functionality. API request working, but missing "Company Name" conditional logic.  |
