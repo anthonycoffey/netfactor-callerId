@@ -46,41 +46,51 @@ function netfactor_callerId(){
 
 	// define REST variables required for GET request
 	$api_url = 'http://sleuth.visitor-track.com/Sleuth?ipAddress='.$ip_address;
+	//	$api_url = 'http://www.google.com:81/'; // TODO: LEAVE FOR TESTING TIMEOUT
 	$token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjamVmZmVyc0BuZXRmYWN0b3IuY29tIiwianRpIjoiYmRlN2M2NWYtM2U1ZS00N2MzLWJjYzktYzljM2IyNjU5YTk4IiwiZW1haWwiOiJjamVmZmVyc0BuZXRmYWN0b3IuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6ImNqZWZmZXJzQG5ldGZhY3Rvci5jb20iLCJleHAiOjE4NTc5Njk4NTksImlzcyI6Imh0dHA6Ly9zbGV1dGgudmlzaXRvci10cmFjay5jb20iLCJhdWQiOiJodHRwOi8vc2xldXRoLnZpc2l0b3ItdHJhY2suY29tIn0.GhmHjeAHrmctO-dDjRj3AK-eEmw2haiwukfW8SRBBUQ';
 	$bearer = 'Bearer';
 
 	// check to ensure this version of WordPress has wp_remote_get() function
 	if(function_exists('wp_remote_get')){
-		$get = wp_remote_get($api_url,array(
+		$request = wp_remote_get($api_url,array(
 			'headers' => array(
 				'Authorization' => "{$bearer} {$token}"
 			),
+			'timeout' => 1
 		));
 
 		// check to ensure this version of WordPress has wp_remote_retrieve_body() function
 		if(function_exists('wp_remote_retrieve_body')){
+
 			ob_start();
-			$body = json_decode(wp_remote_retrieve_body($get));
+
+			$response = json_decode(wp_remote_retrieve_body($request), true);
 
 			// create javascript wrapper
 			echo "<script>";
 
-			if($body->isp == false){
-				// do nothing special
+			if(isset($request->errors)){
+				// print error to console.log
+				echo "console.log('{$request->errors['http_request_failed'][0]}');";
+				// HARDCODE Your Company as companyName
+				$response['companyName'] = "Your Company";
 			} else {
-				// If IsIsp TRUE, then display "Your Company" instead of the value returned by the API
-				$body->companyName = "Your Company";
+				// IF isp TRUE, then display "Your Company" instead of the value returned by the API
+				if($response['isp'] === true){
+					$response['companyName'] = "Your Company";
+				}
 			}
 
-			foreach ($body as $key => $value){
+			foreach ($response as $key => $value){
 				/*
-			  * target each dimension, and autofill the value
-			  */
-					if(in_array($key, $ENABLED_DIMENSIONS)):
-						echo "document.querySelector('span.nf_{$key}').innerHTML = '{$value}';";
-						echo "document.querySelector('input.nf_{$key}').value = '{$value}';";
-					endif;
+				* target each dimension, and autofill the value
+				*/
+				if(in_array($key, $ENABLED_DIMENSIONS)):
+					echo "document.querySelector('span.nf_{$key}').innerHTML = '{$value}';";
+					echo "document.querySelector('input.nf_{$key}').value = '{$value}';";
+				endif;
 			}
+
 
 			echo "</script>";
 
@@ -93,67 +103,12 @@ function netfactor_callerId(){
 
 
 /**
-* This function does the same thing as netfactor_callerId(), except it just prints out <span class="nf_DIMENSIONHERE">
-* for every Dimension listed on page 5 of the VisitorTrack IP-Based API Documentation
-*
-* This function is triggered by using the following shortcode: [netfactor_debug]
-*
-* This function is used to test the javascript that "auto-fills" all matched values
-*
-*/
-add_shortcode('netfactor_debug','netfactor_make_spans');
-function netfactor_make_spans(){
-	// ENABLED DIMENSIONS
-	// add more strings to the array to enable support for more values
-	$ENABLED_DIMENSIONS = array('companyName');
-
-	// get IP address of visitor
-	if(function_exists('netfactor_get_user_ip')){
-		$ip_address = netfactor_get_user_ip();
-	}
-
-	// define variables
-	$api_url = 'http://sleuth.visitor-track.com/Sleuth?ipAddress='.$ip_address;
-	$token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjamVmZmVyc0BuZXRmYWN0b3IuY29tIiwianRpIjoiYmRlN2M2NWYtM2U1ZS00N2MzLWJjYzktYzljM2IyNjU5YTk4IiwiZW1haWwiOiJjamVmZmVyc0BuZXRmYWN0b3IuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6ImNqZWZmZXJzQG5ldGZhY3Rvci5jb20iLCJleHAiOjE4NTc5Njk4NTksImlzcyI6Imh0dHA6Ly9zbGV1dGgudmlzaXRvci10cmFjay5jb20iLCJhdWQiOiJodHRwOi8vc2xldXRoLnZpc2l0b3ItdHJhY2suY29tIn0.GhmHjeAHrmctO-dDjRj3AK-eEmw2haiwukfW8SRBBUQ';
-	$bearer = 'Bearer';
-
-	// check to ensure this version of WordPress has wp_remote_get() function
-	if(function_exists('wp_remote_get')){
-		$get = wp_remote_get($api_url,array(
-			'headers' => array(
-				'Authorization' => "{$bearer} {$token}"
-			),
-		));
-
-		// check to ensure this version of WordPress has wp_remote_retrieve_body() function
-		if(function_exists('wp_remote_retrieve_body')){
-			// get body of reponse, convert to PHP
-			$body = json_decode(wp_remote_retrieve_body($get));
-
-			if($body->isp == false){
-
-			} else {
-				// If IsIsp TRUE, then display "Your Company" instead of the value returned by the API
-				$body->companyName = "Your Company";
-			}
-
-			foreach ($body as $key => $value){
-				if(in_array($key, $ENABLED_DIMENSIONS)) {
-					echo "<span class='nf_{$key}' style='display: block;'></span>";
-					echo "<input class='nf_{$key}' value='' type='text'>";
-				}
-			}
-		}
-	}
-
-}
-
-/**
 *  Get visitor's IP address using ipify.org API
 *  read more: https://www.ipify.org/
 */
 function netfactor_get_user_ip() {
 	$ip = file_get_contents('https://api.ipify.org');
+//	$ip = '71.9.28.226';
 	return $ip;
 }
 
