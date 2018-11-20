@@ -9,8 +9,8 @@ Author URI: https://coffeywebdev.com
 
 /**
 *
-* This function is triggered by the 'wp_head' action hook
-* more info: https://codex.wordpress.org/Function_Reference/wp_head
+* This function is triggered by the 'wp_footer' action hook
+* more info: https://codex.wordpress.org/Function_Reference/wp_footer
 *
 * Below I've used the 'Dimension' with a prefix of 'nf_' to create a CSS selector that looks like this:
 * .nf_companyId
@@ -37,7 +37,6 @@ function netfactor_callerId(){
 	// ENABLED DIMENSIONS
 	// add more strings to the array to enable support for more values
 	$ENABLED_DIMENSIONS = array('companyName');
-
 
 	// get IP address of visitor
 	if(function_exists('netfactor_get_user_ip')){
@@ -108,7 +107,6 @@ function netfactor_callerId(){
 */
 function netfactor_get_user_ip() {
 	$ip = file_get_contents('https://api.ipify.org');
-//	$ip = '71.9.28.226';
 	return $ip;
 }
 
