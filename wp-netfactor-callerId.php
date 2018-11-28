@@ -40,6 +40,7 @@ function netfactor_callerId(){
 
 	// get IP address of visitor
 	if(function_exists('netfactor_get_user_ip')){
+		$ip_address = null;
 		$ip_address = netfactor_get_user_ip();
 	}
 
