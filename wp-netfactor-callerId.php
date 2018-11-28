@@ -40,7 +40,7 @@ function netfactor_callerId(){
 
 	// get IP address of visitor
 	if(function_exists('netfactor_get_user_ip')){
-		$ip_address = null;
+		$ip_address = "";
 		$ip_address = netfactor_get_user_ip();
 	}
 
@@ -105,33 +105,19 @@ function netfactor_callerId(){
 
 
 /**
-*  Get visitor's IP address using ipify.org API
-*  read more: https://www.ipify.org/
+*  Get visitor's IP address
 */
 function netfactor_get_user_ip() {
-	// Get real visitor IP behind CloudFlare network
-	if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
-		$_SERVER['REMOTE_ADDR'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
-		$_SERVER['HTTP_CLIENT_IP'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
+	if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+	//check ip from share internet
+		$ip = $_SERVER['HTTP_CLIENT_IP'];
+	} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+	//to check ip is pass from proxy
+		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	} else {
+		$ip = $_SERVER['REMOTE_ADDR'];
 	}
-	$client  = @$_SERVER['HTTP_CLIENT_IP'];
-	$forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
-	$remote  = $_SERVER['REMOTE_ADDR'];
-
-	if(filter_var($client, FILTER_VALIDATE_IP))
-	{
-		$ip = $client;
-	}
-	elseif(filter_var($forward, FILTER_VALIDATE_IP))
-	{
-		$ip = $forward;
-	}
-	else
-	{
-		$ip = $remote;
-	}
-
-	return $ip;
+	return apply_filters( 'wpb_get_ip', $ip );
 }
 
 ?>
