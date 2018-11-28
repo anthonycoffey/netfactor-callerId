@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: Netfactor CallerId for WordPress
-Description: This is a custom plugin that utilizes the VisitorTrack IP-Based API to target all dimensions using a prefixed CSS selector, and then inesrt the respective value into the targeted HTML element.
+Description: This is a custom plugin that utilizes the VisitorTrack IP-Based API to target all dimensions using a prefixed CSS selector, and then inserts the respective value into the targeted HTML element.
 Author: Anthony Coffey
-Version: 0.4
+Version: 0.4.2
 Author URI: https://coffeywebdev.com
 */
 
@@ -45,7 +45,7 @@ function netfactor_callerId(){
 
 	// define REST variables required for GET request
 	$api_url = 'http://sleuth.visitor-track.com/Sleuth?ipAddress='.$ip_address;
-	//	$api_url = 'http://www.google.com:81/'; // TODO: LEAVE FOR TESTING TIMEOUT
+//		$api_url = 'http://www.google.com:81/'; // TODO: LEAVE FOR TESTING TIMEOUT
 	$token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjamVmZmVyc0BuZXRmYWN0b3IuY29tIiwianRpIjoiYmRlN2M2NWYtM2U1ZS00N2MzLWJjYzktYzljM2IyNjU5YTk4IiwiZW1haWwiOiJjamVmZmVyc0BuZXRmYWN0b3IuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6ImNqZWZmZXJzQG5ldGZhY3Rvci5jb20iLCJleHAiOjE4NTc5Njk4NTksImlzcyI6Imh0dHA6Ly9zbGV1dGgudmlzaXRvci10cmFjay5jb20iLCJhdWQiOiJodHRwOi8vc2xldXRoLnZpc2l0b3ItdHJhY2suY29tIn0.GhmHjeAHrmctO-dDjRj3AK-eEmw2haiwukfW8SRBBUQ';
 	$bearer = 'Bearer';
 
@@ -68,9 +68,12 @@ function netfactor_callerId(){
 			// create javascript wrapper
 			echo "<script>";
 
+			echo "console.log('%c IP Address: {$ip_address}', 'color: red; font-size: 20px');";
+			echo "console.log('%c IsIsp: {$response['isp']}', 'color: red; font-size: 20px');";
+
 			if(isset($request->errors)){
 				// print error to console.log
-				echo "console.log('{$request->errors['http_request_failed'][0]}');";
+				echo "console.log('%c ERROR: {$request->errors['http_request_failed'][0]}', 'color: red; font-size: 20px');";
 				// HARDCODE Your Company as companyName
 				$response['companyName'] = "Your Company";
 			} else {
@@ -86,10 +89,9 @@ function netfactor_callerId(){
 				*/
 				if(in_array($key, $ENABLED_DIMENSIONS)):
 					echo "document.querySelector('span.nf_{$key}').innerHTML = '{$value}';";
-					echo "document.querySelector('input.nf_{$key}').value = '{$value}';";
+//					echo "document.querySelector('input.nf_{$key}').value = '{$value}';";   // input field support disabled for now
 				endif;
 			}
-
 
 			echo "</script>";
 
@@ -106,7 +108,28 @@ function netfactor_callerId(){
 *  read more: https://www.ipify.org/
 */
 function netfactor_get_user_ip() {
-	$ip = file_get_contents('https://api.ipify.org');
+	// Get real visitor IP behind CloudFlare network
+	if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
+		$_SERVER['REMOTE_ADDR'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
+		$_SERVER['HTTP_CLIENT_IP'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
+	}
+	$client  = @$_SERVER['HTTP_CLIENT_IP'];
+	$forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
+	$remote  = $_SERVER['REMOTE_ADDR'];
+
+	if(filter_var($client, FILTER_VALIDATE_IP))
+	{
+		$ip = $client;
+	}
+	elseif(filter_var($forward, FILTER_VALIDATE_IP))
+	{
+		$ip = $forward;
+	}
+	else
+	{
+		$ip = $remote;
+	}
+
 	return $ip;
 }
 
