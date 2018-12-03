@@ -56,7 +56,7 @@ function netfactor_callerId(){
 			'headers' => array(
 				'Authorization' => "{$bearer} {$token}"
 			),
-			'timeout' => 1
+			'timeout' => 20
 		));
 
 		// check to ensure this version of WordPress has wp_remote_retrieve_body() function
@@ -108,15 +108,7 @@ function netfactor_callerId(){
 *  Get visitor's IP address
 */
 function netfactor_get_user_ip() {
-	if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-	//check ip from share internet
-		$ip = $_SERVER['HTTP_CLIENT_IP'];
-	} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-	//to check ip is pass from proxy
-		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-	} else {
-		$ip = $_SERVER['REMOTE_ADDR'];
-	}
+	$ip = file_get_contents('https://api.ipify.org');
 	return apply_filters( 'wpb_get_ip', $ip );
 }
 
