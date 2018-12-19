@@ -88,6 +88,7 @@
    
    | Version  | Description |
    | ------------- | ------------- |
+   | 1.0  | API Token updated, and plugin has been tested/approved for deployment on live site. |
    | 0.4  | Carefully revised existing logic, and added control structure to handle API request timeouts. Removed debugging shortcode, as it was just complicating things and was no longer necessary this far into development. Added console.log() for timeout error when it occurs. |
    | 0.3  | Removed jQuery wrapper, and replaced previous jQuery approach with pure vanilla JS. Additionally, I've updated the `wp_head` action hook that uses `netfactor_callerId()` as it's callback function. I've replaced `wp_head` with `wp_footer`, this inserts the Javascript in the footer, after the DOM has loaded up. |
    | 0.2  | Added "Company Name" logic, and improved core functionality. Now, Ipify is used to get the public IP address of site visitors. Also, added a variable to both functions that retricts enabled fields. By adding values to the "Enabled Dimensions" array, you can enable more fields. Currently, all fields are disabled ***EXCEPT*** 'companyName'
