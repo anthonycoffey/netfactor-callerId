@@ -3,7 +3,7 @@
 Plugin Name: Netfactor CallerId for WordPress
 Description: This is a custom plugin that utilizes the VisitorTrack IP-Based API to target all dimensions using a prefixed CSS selector, and then inserts the respective value into the targeted HTML element.
 Author: Anthony Coffey
-Version: 1.0
+Version: 1.1
 Author URI: https://coffeywebdev.com
 */
 
@@ -56,7 +56,7 @@ function netfactor_callerId(){
 			'headers' => array(
 				'Authorization' => "{$bearer} {$token}"
 			),
-			'timeout' => 20
+			'timeout' => 2
 		));
 
 		// check to ensure this version of WordPress has wp_remote_retrieve_body() function

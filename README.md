@@ -88,6 +88,7 @@
    
    | Version  | Description |
    | ------------- | ------------- |
+   | 1.1  | Reduced timeout time to 2 seconds, down from 20 seconds. |
    | 1.0  | API Token updated, and plugin has been tested/approved for deployment on live site. |
    | 0.4  | Carefully revised existing logic, and added control structure to handle API request timeouts. Removed debugging shortcode, as it was just complicating things and was no longer necessary this far into development. Added console.log() for timeout error when it occurs. |
    | 0.3  | Removed jQuery wrapper, and replaced previous jQuery approach with pure vanilla JS. Additionally, I've updated the `wp_head` action hook that uses `netfactor_callerId()` as it's callback function. I've replaced `wp_head` with `wp_footer`, this inserts the Javascript in the footer, after the DOM has loaded up. |
