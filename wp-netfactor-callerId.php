@@ -89,7 +89,8 @@ function netfactor_callerId(){
 				* target each dimension, and autofill the value
 				*/
 				if(in_array($key, $ENABLED_DIMENSIONS)):
-					echo "document.querySelectorAll('span.nf_{$key}').innerHTML = '{$value}';";
+//					echo "document.querySelectorAll('span.nf_{$key}').innerHTML = '{$value}';";
+					echo "jQuery('span.nf_{$key}').html('{$value}');";
 //					echo "document.querySelector('input.nf_{$key}').value = '{$value}';";   // input field support disabled for now
 				endif;
 			}
